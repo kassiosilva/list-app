@@ -9,21 +9,23 @@ import Login from '../pages/Login';
 import SignUp from '../pages/SignUp';
 import Home from '../pages/Home';
 
+import Edit from '../components/Edit';
+import Create from '../components/Create';
+import Show from '../components/Show';
+
 export default class Routes extends Component {
-  state = { loading: true, authenticated: false, user: null };
+  state = { loading: true, authenticated: false };
 
   componentWillMount() {
     app.auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({
           authenticated: true,
-          currentUser: user,
           loading: false,
         });
       } else {
         this.setState({
           authenticated: false,
-          currentUser: null,
           loading: false,
         });
       }
@@ -40,6 +42,11 @@ export default class Routes extends Component {
     return (
       <Switch>
         <PrivateRoute exact path="/" component={Home} authenticated={authenticated} />
+        <PrivateRoute path="/edit" component={Edit} authenticated={authenticated} />
+        <PrivateRoute path="/edit/:id" component={Edit} authenticated={authenticated} />
+        <PrivateRoute path="/create" component={Create} authenticated={authenticated} />
+        <PrivateRoute path="/show" component={Show} authenticated={authenticated} />
+        <PrivateRoute path="/show/:id" component={Show} authenticated={authenticated} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={SignUp} />
       </Switch>

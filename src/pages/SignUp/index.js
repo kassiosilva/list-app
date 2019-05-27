@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 
-import app from '../../services/firebase';
+import { Container, Form, ContainerForm } from './styles';
 
-// import { Container } from './styles';
+import app from '../../services/firebase';
 
 class SignUp extends Component {
   handleSignUp = async (event) => {
@@ -12,7 +12,7 @@ class SignUp extends Component {
     const { email, password } = event.target.elements;
 
     try {
-      const user = await app.auth().createUserWithEmailAndPassword(email.value, password.value);
+      await app.auth().createUserWithEmailAndPassword(email.value, password.value);
 
       this.props.history.push('/');
     } catch (error) {
@@ -22,24 +22,43 @@ class SignUp extends Component {
 
   render() {
     return (
-      <div>
-        <h1>Sign up</h1>
-        <form onSubmit={this.handleSignUp}>
-          <label>
-            Email
-            <input name="email" type="email" placeholder="Email" />
-          </label>
-          <label>
-            Password
-            <input name="password" type="password" placeholder="Password" />
-          </label>
-          <button type="submit">Sign Up</button>
-        </form>
+      <Container>
+        <ContainerForm>
+          <h3>Cadastre-se</h3>
 
-        <Link to="/login">
-          <p>Voltar</p>
-        </Link>
-      </div>
+          <Form onSubmit={this.handleSignUp}>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+
+              <input
+                name="email"
+                id="email"
+                className="form-control"
+                type="email"
+                placeholder="Digite seu E-mail"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Senha</label>
+
+              <input
+                name="password"
+                id="password"
+                type="password"
+                placeholder="Digite sua Senha"
+                className="form-control"
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary login-button">
+              Criar conta
+            </button>
+          </Form>
+
+          <Link to="/login">Voltar</Link>
+        </ContainerForm>
+      </Container>
     );
   }
 }
