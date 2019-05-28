@@ -1,9 +1,13 @@
 import React from 'react';
 
-import { Spinner } from './styles';
+import { Spinner, Container } from './styles';
 
 // import { Container } from './styles';
 
-const Loader = () => <div className="spinner" />;
+const Loader = () => (
+  <Container>
+    <Spinner />
+  </Container>
+);
 
 export default Loader;

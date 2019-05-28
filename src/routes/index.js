@@ -12,6 +12,7 @@ import Home from '../pages/Home';
 import Edit from '../components/Edit';
 import Create from '../components/Create';
 import Show from '../components/Show';
+import Loader from '../components/Loader';
 
 export default class Routes extends Component {
   state = { loading: true, authenticated: false };
@@ -40,15 +41,15 @@ export default class Routes extends Component {
     const { authenticated, loading } = this.state;
 
     if (loading) {
-      return <p>Loading..</p>;
+      return <Loader />;
     }
 
     return (
       <Switch>
         <PrivateRoute exact path="/" component={Home} authenticated={authenticated} />
-        <Route path="/edit/:id" component={Edit} />
-        <Route path="/create" component={Create} />
-        <Route path="/show/:id" component={Show} />
+        <PrivateRoute path="/edit/:id" component={Edit} authenticated={authenticated} />
+        <PrivateRoute path="/create" component={Create} authenticated={authenticated} />
+        <PrivateRoute path="/show/:id" component={Show} authenticated={authenticated} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={SignUp} />
       </Switch>
