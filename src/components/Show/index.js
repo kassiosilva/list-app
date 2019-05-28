@@ -5,44 +5,52 @@ import app from '../../services/firebase';
 
 class Show extends Component {
   state = {
-    board: {},
+    items: '',
     key: '',
   };
 
   componentDidMount() {
+    this.requestDoc();
+  }
+
+  requestDoc = async () => {
     const ref = app
       .firestore()
       .collection('lists')
       .doc(this.props.match.params.id);
-    ref.get().then((doc) => {
-      if (doc.exists) {
-        this.setState({
-          board: doc.data(),
-          key: doc.id,
-          isLoading: false,
-        });
-      } else {
-        console.log('No such document!');
-      }
-    });
-  }
 
-  delete(id) {
-    app
-      .firestore()
-      .collection('lists')
-      .doc(id)
-      .delete()
-      .then(() => {
-        console.log('Document successfully deleted!');
-        this.props.history.push('/');
-      })
-      .catch((error) => {
-        console.error('Error removing document: ', error);
+    const doc = await ref.get();
+
+    if (doc.exists) {
+      this.setState({
+        items: doc.data(),
+        key: doc.id,
       });
-  }
+    } else {
+      alert('Item não encontrado');
+    }
+  };
+
+  delete = async (id) => {
+    try {
+      await app
+        .firestore()
+        .collection('lists')
+        .doc(id)
+        .delete();
+
+      alert('Item removido com sucesso!');
+      this.props.history.push('/');
+    } catch (error) {
+      console.error('Erro ao remover item');
+    }
+  };
 
   render() {
+    const {
+      items: { title, description, author },
+    } = this.state;
+
     return (
       <div className="container">
         <div className="panel panel-default">
@@ -50,21 +58,27 @@ class Show extends Component {
             <h4>
               <Link to="/">Board List</Link>
             </h4>
-            <h3 className="panel-title">{this.state.board.title}</h3>
+
+            <h3 className="panel-title">{title}</h3>
           </div>
+
           <div className="panel-body">
             <dl>
-              <dt>Description:</dt>
-              <dd>{this.state.board.description}</dd>
-              <dt>Author:</dt>
-              <dd>{this.state.board.author}</dd>
+              <dt>Descrição:</dt>
+              <dd>{description}</dd>
+              <dt>Autor:</dt>
+              <dd>{author}</dd>
             </dl>
             <Link to={`/edit/${this.state.key}`} class="btn btn-success">
-              Edit
+              Editar
             </Link>
             &nbsp;
-            <button onClick={this.delete.bind(this, this.state.key)} className="btn btn-danger">
-              Delete
+            <button
+              type="button"
+              onClick={() => this.delete(this.state.key)}
+              className="btn btn-danger"
+            >
+              Remover
             </button>
           </div>
         </div>

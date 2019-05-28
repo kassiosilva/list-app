@@ -56,7 +56,7 @@ class Login extends Component {
             </button>
           </Form>
 
-          <Link to="/signup">Novo no Budget? Crie uma conta</Link>
+          <Link to="/signup">Novo por aqui? Crie uma conta</Link>
         </ContainerForm>
       </Container>
     );

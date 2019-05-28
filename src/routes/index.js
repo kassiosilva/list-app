@@ -17,6 +17,10 @@ export default class Routes extends Component {
   state = { loading: true, authenticated: false };
 
   componentWillMount() {
+    this.verifyAuth();
+  }
+
+  verifyAuth = () => {
     app.auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({
@@ -30,7 +34,7 @@ export default class Routes extends Component {
         });
       }
     });
-  }
+  };
 
   render() {
     const { authenticated, loading } = this.state;
@@ -42,11 +46,9 @@ export default class Routes extends Component {
     return (
       <Switch>
         <PrivateRoute exact path="/" component={Home} authenticated={authenticated} />
-        <PrivateRoute path="/edit" component={Edit} authenticated={authenticated} />
-        <PrivateRoute path="/edit/:id" component={Edit} authenticated={authenticated} />
-        <PrivateRoute path="/create" component={Create} authenticated={authenticated} />
-        <PrivateRoute path="/show" component={Show} authenticated={authenticated} />
-        <PrivateRoute path="/show/:id" component={Show} authenticated={authenticated} />
+        <Route path="/edit/:id" component={Edit} />
+        <Route path="/create" component={Create} />
+        <Route path="/show/:id" component={Show} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={SignUp} />
       </Switch>

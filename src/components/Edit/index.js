@@ -3,46 +3,50 @@ import { Link } from 'react-router-dom';
 
 import app from '../../services/firebase';
 
-class Edit extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      key: '',
-      title: '',
-      description: '',
-      author: '',
-    };
-  }
+export default class Edit extends Component {
+  state = {
+    key: '',
+    title: '',
+    description: '',
+    author: '',
+  };
 
   componentDidMount() {
+    this.requestDoc();
+  }
+
+  requestDoc = async () => {
     const ref = app
       .firestore()
       .collection('lists')
       .doc(this.props.match.params.id);
-    ref.get().then((doc) => {
-      if (doc.exists) {
-        const board = doc.data();
 
-        this.setState({
-          key: doc.id,
-          title: board.title,
-          description: board.description,
-          author: board.author,
-        });
-      } else {
-        console.log('No such document!');
-      }
-    });
-  }
+    const doc = await ref.get();
+
+    if (doc.exists) {
+      const item = doc.data();
+
+      this.setState({
+        key: doc.id,
+        title: item.title,
+        description: item.description,
+        author: item.author,
+      });
+    } else {
+      alert('Nenhum documento encontrado');
+    }
+  };
 
   onChange = (e) => {
     const { state } = this;
+
     state[e.target.name] = e.target.value;
-    this.setState({ board: state });
+
+    this.setState(state);
   };
 
-  onSubmit = (e) => {
-    e.preventDefault();
+  onSubmit = async (event) => {
+    event.preventDefault();
 
     const { title, description, author } = this.state;
 
@@ -50,24 +54,25 @@ class Edit extends Component {
       .firestore()
       .collection('lists')
       .doc(this.state.key);
-    updateRef
-      .set({
+
+    try {
+      await updateRef.set({
         title,
         description,
         author,
-      })
-      .then((docRef) => {
-        this.setState({
-          key: '',
-          title: '',
-          description: '',
-          author: '',
-        });
-        this.props.history.push(`/show/${this.props.match.params.id}`);
-      })
-      .catch((error) => {
-        console.error('Error adding document: ', error);
       });
+
+      this.setState({
+        key: '',
+        title: '',
+        description: '',
+        author: '',
+      });
+
+      this.props.history.push(`/show/${this.props.match.params.id}`);
+    } catch (error) {
+      console.error('Erro ao editar item');
+    }
   };
 
   render() {
@@ -75,17 +80,18 @@ class Edit extends Component {
       <div className="container">
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h3 className="panel-title">EDIT BOARD</h3>
+            <h3 className="panel-title">Editar Item</h3>
           </div>
+
           <div className="panel-body">
             <h4>
               <Link to={`/show/${this.state.key}`} class="btn btn-primary">
-                Board List
+                Voltar
               </Link>
             </h4>
             <form onSubmit={this.onSubmit}>
               <div className="form-group">
-                <label htmlFor="title">Title:</label>
+                <label htmlFor="title">Título:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -95,8 +101,9 @@ class Edit extends Component {
                   placeholder="Title"
                 />
               </div>
+
               <div className="form-group">
-                <label htmlFor="description">Description:</label>
+                <label htmlFor="description">Descrição:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -106,8 +113,9 @@ class Edit extends Component {
                   placeholder="Description"
                 />
               </div>
+
               <div className="form-group">
-                <label htmlFor="author">Author:</label>
+                <label htmlFor="author">Autor:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -117,8 +125,9 @@ class Edit extends Component {
                   placeholder="Author"
                 />
               </div>
+
               <button type="submit" className="btn btn-success">
-                Submit
+                Enviar
               </button>
             </form>
           </div>
@@ -127,5 +136,3 @@ class Edit extends Component {
     );
   }
 }
-
-export default Edit;

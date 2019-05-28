@@ -5,72 +5,71 @@ import app from '../../services/firebase';
 
 import LogOut from '../../components/LogOut';
 
-// import { Container } from './styles';
+import { ContainerPaner } from './styles';
 
 export default class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.ref = app.firestore().collection('lists');
-    this.unsubscribe = null;
-    this.state = {
-      boards: [],
-    };
-  }
+  state = {
+    items: [],
+  };
 
   componentDidMount() {
-    this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate);
+    const ref = app.firestore().collection('lists');
+
+    ref.onSnapshot(this.onCollectionUpdate);
   }
 
   onCollectionUpdate = (querySnapshot) => {
-    const boards = [];
+    const items = [];
+
     querySnapshot.forEach((doc) => {
       const { title, description, author } = doc.data();
-      boards.push({
-        key: doc.id,
-        doc, // DocumentSnapshot
+
+      items.push({
         title,
+        doc,
+        key: doc.id,
         description,
         author,
       });
     });
+
     this.setState({
-      boards,
+      items,
     });
   };
 
   render() {
+    const { items } = this.state;
+
     return (
       <div className="container">
-        <LogOut />
-
         <div className="panel panel-default">
-          <div className="panel-heading">
-            <h3 className="panel-title">BOARD LIST</h3>
+          <div className="panel-heading d-flex p-2 bd-highlight justify-content-around">
+            <h3 className="panel-title">Lista de itens</h3>
+            <LogOut />
           </div>
+
           <div className="panel-body">
             <h4>
-              <Link to="/create">Add Board</Link>
+              <Link to="/create">
+                <button type="button" className="btn btn-primary">
+                  Adicionar
+                </button>
+              </Link>
             </h4>
-            <table className="table table-stripe">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Author</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.boards.map(board => (
-                  <tr>
-                    <td>
-                      <Link to={`/show/${board.key}`}>{board.title}</Link>
-                    </td>
-                    <td>{board.description}</td>
-                    <td>{board.author}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            {items.map(item => (
+              <ContainerPaner className="card container-card " key={item.key}>
+                <div className="card-body">
+                  <h5 className="card-title">{item.title}</h5>
+                  <p className="card-text">{item.description}</p>
+
+                  <Link to={`/show/${item.key}`} className="btn btn-primary">
+                    Mais informações
+                  </Link>
+                </div>
+              </ContainerPaner>
+            ))}
           </div>
         </div>
       </div>

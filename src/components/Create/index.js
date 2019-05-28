@@ -3,64 +3,55 @@ import { Link } from 'react-router-dom';
 
 import app from '../../services/firebase';
 
-class Create extends Component {
-  constructor() {
-    super();
-    this.ref = app.firestore().collection('lists');
-    this.state = {
-      title: '',
-      description: '',
-      author: '',
-    };
-  }
+export default class Create extends Component {
+  state = {
+    title: '',
+    description: '',
+    author: '',
+  };
 
-  onChange = (e) => {
+  onChange = (event) => {
     const { state } = this;
-    state[e.target.name] = e.target.value;
+
+    state[event.target.name] = event.target.value;
+
     this.setState(state);
   };
 
-  onSubmit = (e) => {
-    e.preventDefault();
+  onSubmit = async (event) => {
+    event.preventDefault();
+
+    const ref = app.firestore().collection('lists');
 
     const { title, description, author } = this.state;
 
-    this.ref
-      .add({
-        title,
-        description,
-        author,
-      })
-      .then((docRef) => {
-        this.setState({
-          title: '',
-          description: '',
-          author: '',
-        });
-        this.props.history.push('/');
-      })
-      .catch((error) => {
-        console.error('Error adding document: ', error);
-      });
+    try {
+      await ref.add({ title, description, author });
+
+      this.props.history.push('/');
+    } catch (error) {
+      alert('Erro ao criar item');
+    }
   };
 
   render() {
     const { title, description, author } = this.state;
+
     return (
       <div className="container">
         <div className="panel panel-default">
           <div className="panel-heading">
-            <h3 className="panel-title">ADD BOARD</h3>
+            <h3 className="panel-title">Adicionar item</h3>
           </div>
           <div className="panel-body">
             <h4>
               <Link to="/" class="btn btn-primary">
-                Book List
+                Voltar
               </Link>
             </h4>
             <form onSubmit={this.onSubmit}>
               <div className="form-group">
-                <label htmlFor="title">Title:</label>
+                <label htmlFor="title">Título:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -71,8 +62,8 @@ class Create extends Component {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="description">Description:</label>
-                <textArea
+                <label htmlFor="description">Descrição:</label>
+                <textarea
                   className="form-control"
                   name="description"
                   onChange={this.onChange}
@@ -81,10 +72,10 @@ class Create extends Component {
                   rows="3"
                 >
                   {description}
-                </textArea>
+                </textarea>
               </div>
               <div className="form-group">
-                <label htmlFor="author">Author:</label>
+                <label htmlFor="author">Autor:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -95,7 +86,7 @@ class Create extends Component {
                 />
               </div>
               <button type="submit" className="btn btn-success">
-                Submit
+                Criar
               </button>
             </form>
           </div>
@@ -104,5 +95,3 @@ class Create extends Component {
     );
   }
 }
-
-export default Create;
